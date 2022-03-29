@@ -9,9 +9,9 @@ const stats = require("./routes/stats");
 const port = process.env.PORT || 5000;
 
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.resolve(__dirname, "../client/build")));
+  app.use(express.static(path.resolve(__dirname, "client/build")));
   app.get("*", (req, res) => {
-    req.sendFile(path.join(__dirname, "..", "client", "build", "index.html"));
+    req.sendFile(path.join(__dirname, "client", "build", "index.html"));
   })
 }
 
@@ -19,16 +19,16 @@ app.use(cors());
 app.use(express.json());
 app.use("/stats", stats);
 
-app.listen(port, () => {
-  console.log(`Server is running on port: ${port}.`);
-});
-
 app.get("/", (req, res) => {
   res.redirect("/stats/workouts");
 });
 
 app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "../client/build", "index.html"))
+  res.sendFile(path.resolve(__dirname, "client/build", "index.html"))
+});
+
+app.listen(port, () => {
+  console.log(`Server is running on port: ${port}.`);
 });
 
 mongoose.connect(process.env.ATLAS_URI, {
