@@ -37,8 +37,8 @@ function App() {
         setIsError(false);
 
         const [req1, req2] = await Promise.all([
-          fetch("http://localhost:5000/stats/workouts"),
-          fetch("http://localhost:5000/stats/last-workout"),
+          fetch("https://tg-workout-tracker-dashboard.herokuapp.com/stats/workouts"),
+          fetch("https://tg-workout-tracker-dashboard.herokuapp.com/stats/last-workout"),
         ]);
         const workoutsData = await req1.json();
         const userData = await req2.json();
