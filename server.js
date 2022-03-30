@@ -1,7 +1,6 @@
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
-const cors = require("cors");
 const path = require('path');
 require("dotenv").config();
 const stats = require("./routes/stats");
@@ -10,19 +9,13 @@ const port = process.env.PORT || 5000;
 
 app.use(express.static(path.join(__dirname, "/client/build")));
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "/client/build", "index.html"));
+  res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
 });
-
-app.use(cors());
 app.use(express.json());
 app.use("/stats", stats);
 
 app.get("/", (req, res) => {
   res.redirect("/stats/workouts");
-});
-
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "client/build", "index.html"))
 });
 
 app.listen(port, () => {
