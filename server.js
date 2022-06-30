@@ -30,7 +30,7 @@ app.use(express.json());
 app.use("/stats", stats);
 
 app.get("/", (req, res) => {
-  res.redirect("/stats/workouts");
+  res.redirect("/stats");
 });
 
 app.listen(port, () => {

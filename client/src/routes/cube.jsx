@@ -91,7 +91,8 @@ const StyledH2 = styled.h2`
 
 const Cube = () => {
   
-  const url = "http://192.168.31.38:5000/stats";
+  const url = "https://tg-workout-tracker-dashboard.herokuapp.com/stats";
+  //"http://192.168.31.38:5000/stats"
   const { data, isLoading, isError } = useFetch(url);
 
   if (isError) { return <ErrorMessage>{isError.message}</ErrorMessage>};
