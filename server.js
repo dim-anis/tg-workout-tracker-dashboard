@@ -28,6 +28,16 @@ app.use(express.json());
 
 app.use(cookieParser());
 
+if (
+  process.env.NODE_ENV === "production" ||
+  process.env.NODE_ENV === "staging"
+) {
+  app.use(express.static("client/build"));
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname + "/client/build/index.html"));
+  });
+}
+
 app.use("/register", register);
 app.use("/signin", signin);
 app.use("/refresh", refresh);
