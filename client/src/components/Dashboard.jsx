@@ -1,137 +1,189 @@
-import React from "react";
-import { format, parseISO, subMonths, startOfDay } from "date-fns";
+import React, { useState } from "react";
 import styled from "styled-components";
 import useFetch from "../hooks/useFetch";
+import format from "date-fns/format";
 
-import ItemComponent from "./itemComponent";
+import ItemComponent from "./ItemComponent";
 import LineChart from "./LineChart";
 import PieChart from "./PieChart";
 import DashboardTile from "./DashboardTile";
-
-import { getVolume, getWorkoutVolume } from "../utils";
-
-import { ReactComponent as IconFlame } from "../images/icons/flame.svg";
-import { ReactComponent as IconBulb } from "../images/icons/bulb.svg";
-import { ReactComponent as IconLocation } from "../images/icons/location.svg";
-import { ReactComponent as IconCalendar } from "../images/icons/calendar.svg";
-import { ReactComponent as IconCheckbox } from "../images/icons/checkbox.svg";
 import LoadingIcon from "./LoadingIcon";
 
-const pieData = [
-  {id: "workouts done", label: "workoutsDone", value: 12}, 
-  {id: "workouts left", label: "workoutsLeft", value: 4}
-];
+import { ReactComponent as IconBulb } from "../images/icons/bulb.svg";
+import { ReactComponent as IconCalendar } from "../images/icons/calendar.svg";
+import { ReactComponent as IconCheckbox } from "../images/icons/checkbox.svg";
+import { Navigate } from "react-router-dom";
+import WorkoutItem from "./WorkoutsTable/WorkoutItem";
 
-const Welcome = styled.div`
-  grid-column: 1 / span 3;
-  color: var(--text-light-muted);
-`;
-
-const H2 = styled.h2`
-  margin: 0;
-  @media (max-width: 560px) {
-    display: none;
-  }
-`;
-
-const ErrorMessage = styled.div`
-  grid-column-start: 1;
-  grid-column-end: 4;
-  grid-row-start: row1-start;
-  grid-row-end: 2;
+export const FetchResultContainer = styled.div`
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
   display: flex;
   justify-content: center;
   align-items: center;
 `;
 
+const SetContainer = styled.div`
+  width: 100%;
+  max-height: 30vh;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow-y: auto;
+`;
+
+const H2 = styled.h2`
+  width: 100%;
+  text-align: left;
+  margin-bottom: 1rem;
+  font-weight: normal;
+  font-size: var(--fs-600);
+  color: ${(props) => props.theme.textColorSecondary};
+`;
+
 const Dashboard = () => {
-  const url = "https://tg-workout-tracker-dashboard.herokuapp.com/stats";
-  //http://192.168.31.38:5000/stats
-  // https://tg-workout-tracker-dashboard.herokuapp.com/stats
-  const { data: workouts, isLoading, isError } = useFetch(url);
+  const { data: workoutData, isError } = useFetch(`/stats`);
+  const [period, setPeriod] = useState(16);
 
-  let monthFromNowDate = subMonths(new Date(), 1);
-  
+  if (isError?.response?.status === 401) {
+    return <Navigate to="/signin" />;
+  } else if (isError) {
+    return <FetchResultContainer>{isError.message}</FetchResultContainer>;
+  }
 
-  if (isError) { return <ErrorMessage>{isError.message}</ErrorMessage>};
-  if (typeof workouts === "undefined") { return <ErrorMessage><LoadingIcon /></ErrorMessage> };
+  if (!workoutData) {
+    return (
+      <FetchResultContainer>
+        <LoadingIcon />
+      </FetchResultContainer>
+    );
+  }
 
-  const lastWorkoutDate = format(parseISO(Object.values(workouts).at(-1).createdAt), 'LLL d');
+  // selecting last workout's date to display
+  const lastWorkoutDate = format(Date.parse(workoutData.at(-1).date), "MMM d");
 
-  const lastMonthWorkouts = Object.values(workouts).filter((set) => Date.parse(set.createdAt) > startOfDay(monthFromNowDate));
-  const totalVolumeThisMonth = getVolume(lastMonthWorkouts);
-  const totalVolumeThisMonthString = Math.round(totalVolumeThisMonth).toLocaleString();
-  const dailyVolumesThisMonth = getWorkoutVolume(lastMonthWorkouts);
-  console.log(dailyVolumesThisMonth)
-  // selecting last 4 workouts, "x" stands for date, "y" stands for volume (nivo requires {x: value, y: value} data format)
-  const volumeThisWeek = dailyVolumesThisMonth.slice(-5, -1).reduce((totalVolume, day) => totalVolume + day.y, 0);
-  // selecting 4 workouts second to last 4 workouts
-  const volumeLastWeek = dailyVolumesThisMonth.slice(-9, -5).reduce((totalVolume, day) => totalVolume + day.y, 0);
+  const lastWeekOfWorkouts = workoutData.slice(-4);
+  const secondToLastWeekOfWorkouts = workoutData.slice(-8, -4);
+  const lastMonthOfWorkouts = workoutData.slice(-16);
+
+  // a function that returns a reduced value of the total volume per workout
+  const volumePerWorkout = (sets) =>
+    sets.reduce((total, set) => total + set.weight * set.repetitions, 0);
+
+  const rpePerWorkout = (sets) =>
+    sets.reduce((total, set) => total + set.rpe, 0) / sets.length;
+
+  const mesoStart = workoutData
+    .filter((workout) => rpePerWorkout(workout.sets) < 7)
+    .at(-1);
+
+  // adding 1 to the index since the new meso starts after the deload
+  const mesoIndex = workoutData.indexOf(mesoStart) + 1;
+
+  const workoutsThisMeso = workoutData.slice(mesoIndex).length;
+
+  const volumeThisWeek = lastWeekOfWorkouts.reduce(
+    (totalVolume, workout) => totalVolume + volumePerWorkout(workout.sets),
+    0
+  );
+  const volumeLastWeek = secondToLastWeekOfWorkouts.reduce(
+    (totalVolume, workout) => totalVolume + volumePerWorkout(workout.sets),
+    0
+  );
+  const volumeThisMonth = lastMonthOfWorkouts.reduce(
+    (totalVolume, workout) => totalVolume + volumePerWorkout(workout.sets),
+    0
+  );
+
+  const diff = (
+    ((volumeThisWeek - volumeLastWeek) / volumeThisWeek) *
+    100
+  ).toFixed(1);
+
+  const selectPeriod = workoutData.slice(-period);
+
+  const chartData = selectPeriod.map((workout) => ({
+    x: workout.date,
+    y: Math.floor(volumePerWorkout(workout.sets)),
+  }));
+
+  const pieChartData = [
+    {
+      id: "done",
+      label: "done",
+      value: workoutsThisMeso,
+    },
+    {
+      id: "left",
+      label: "left",
+      value: 20 - workoutsThisMeso,
+    },
+  ];
 
   return (
     <>
-    <Welcome>
-      <H2>Good afternoon, Dmitry!</H2>
-    </Welcome>
-    <DashboardTile 
-      span={"1 / span 3"} 
-      //direction={"column"}
+      <DashboardTile gColumn={"1 / -1"}>
+        <LineChart
+          height={"60%"}
+          margin={{ top: 20, right: 40, bottom: 50, left: 40 }}
+          data={chartData}
+          title={`VOLUME THIS MONTH`}
+          titleValue={new Intl.NumberFormat().format(volumeThisMonth)}
+          yValueUnit={"KG"}
+          xValueType={"Date"}
+          yValueType={"Volume"}
+          setPeriod={setPeriod}
+        />
+      </DashboardTile>
+      <DashboardTile justifyContent={"left"} alignItems={"center"}>
+        <ItemComponent
+          icon={<IconBulb />}
+          data={new Intl.NumberFormat().format(volumeThisWeek)}
+          diff={new Intl.NumberFormat().format(diff)}
+          title={"VOLUME THIS WEEK"}
+        />
+      </DashboardTile>
+      <DashboardTile
+        flexDirection={"column"}
+        justifyContent={"center"}
+        alignItems={"left"}
       >
-      <LineChart
-        margin={{ top: 10, right: 20, bottom: 50, left: 45 }}
-        data={dailyVolumesThisMonth}
-        title={`Total volume:`}
-        titleValue={totalVolumeThisMonthString}
-        yValueUnit={'kg'}
-        xValueType={"Date"}
-        yValueType={"Volume"}
-        />  
-    </DashboardTile>
-    <DashboardTile >
-      <ItemComponent
-        icon={ <IconLocation /> } 
-        data={`${Math.round(volumeThisWeek).toLocaleString()} kgs`} 
-        title={"VOLUME THIS WEEK"} 
-        changePercentage={Number.parseFloat(((volumeThisWeek - volumeLastWeek) / volumeThisWeek) * 100).toFixed(1)}
-      />
-    </DashboardTile>
-    <DashboardTile>
-      <ItemComponent
-        icon={ <IconBulb /> } 
-        data={`${Math.round(totalVolumeThisMonth).toLocaleString()} kgs`} 
-        title={"VOLUME THIS MONTH"}
-      />
-    </DashboardTile>
-    <DashboardTile>
-      <ItemComponent
-        data={dailyVolumesThisMonth.length}
-        title={"WORKOUTS THIS MONTH"}
-        icon={ <IconCheckbox /> }
-      />
-    </DashboardTile>
-    <DashboardTile>
-      <ItemComponent 
-        icon={ <IconCalendar /> }
-        data={lastWorkoutDate} 
-        title={"LAST WORKOUT"} 
-      />
-    </DashboardTile>
-    <DashboardTile>
-      <ItemComponent 
-        data={"undefined"} 
-        title={"NEXT WORKOUT"} 
-        icon={ <IconFlame /> }
-      />
-    </DashboardTile>
-    <DashboardTile>
-      <PieChart 
-        data={pieData}
-        total={dailyVolumesThisMonth.length}
-        title={"WORKOUTS THIS MONTH"}
-      />
-    </DashboardTile>
+        <ItemComponent
+          data={workoutsThisMeso}
+          title={"WORKOUTS THIS MESOCYCLE"}
+          icon={<IconCheckbox />}
+        />
+        <progress max={20} value={workoutsThisMeso}>
+          {workoutsThisMeso}
+        </progress>
+        {/* <PieChart
+          data={pieChartData}
+          total={20}
+          title={"WORKOUTS THIS MESOCYCLE"}
+        /> */}
+      </DashboardTile>
+      <DashboardTile justifyContent={"left"} alignItems={"center"}>
+        <ItemComponent
+          icon={<IconCalendar />}
+          data={lastWorkoutDate}
+          title={"LAST WORKOUT"}
+        />
+      </DashboardTile>
+      <DashboardTile gColumn={"1 / -1"} flexDirection={"column"}>
+        <H2>History</H2>
+        <SetContainer>
+          {workoutData.at(-1).sets.map((workout) => (
+            <WorkoutItem
+              id={workout._id}
+              name={workout.exercise}
+              date={`RPE: ${workout.rpe}`}
+              weight={workout.weight}
+            />
+          ))}
+        </SetContainer>
+      </DashboardTile>
     </>
-   );
-}
- 
+  );
+};
+
 export default Dashboard;
