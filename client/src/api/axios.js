@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const URL = "http://192.168.31.38:5000";
-//const URL = "https://tg-workout-tracker-dashboard.herokuapp.com";
+//const URL = "http://192.168.31.38:5000";
+const URL = "https://tg-workout-tracker-dashboard.herokuapp.com";
 
 export default axios.create({
   baseURL: URL,
