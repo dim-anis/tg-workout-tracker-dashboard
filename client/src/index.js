@@ -1,26 +1,19 @@
 import ReactDOM from "react-dom/client";
-import { 
-  BrowserRouter,
-  Routes,
-  Route
-} from "react-router-dom";
-
-import Fire from "./routes/fire";
-import Cube from "./routes/cube";
 import App from "./App";
-import Dashboard from "./components/Dashboard";
+import AuthProvider from "./contexts/AuthContext";
 
-const root = ReactDOM.createRoot(
-  document.getElementById("root")
-);
+import { ThemeProviderReact } from "./contexts/ThemeProvider";
+
+const ThemeWrapper = ({ children }) => {
+  return <ThemeProviderReact>{children}</ThemeProviderReact>;
+};
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+
 root.render(
-  <BrowserRouter>
-    <Routes>
-      <Route path="/" element={<App />} >
-        <Route index element={<Dashboard />} />
-        <Route path="cube" element={<Cube />} />
-        <Route path="fire" element={<Fire />} />
-      </Route>
-    </Routes>
-  </BrowserRouter>
+  <ThemeWrapper>
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  </ThemeWrapper>
 );

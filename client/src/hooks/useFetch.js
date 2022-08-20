@@ -1,35 +1,43 @@
 import { useEffect, useState } from "react";
+import useAxiosPrivate from "./useAxiosPrivate";
 
-const useFetch = (url) => {
-  let [ data, setData ] = useState(undefined);
-  let [ isError, setIsError ] = useState(null);
-  let [ isLoading, setIsLoading ] = useState(false);
-  
+const useFetch = (endpoint) => {
+  const [data, setData] = useState(undefined);
+  const [isError, setIsError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const axiosPrivate = useAxiosPrivate();
+
   useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
+
     const fetchData = async () => {
       try {
         setIsLoading(true);
         setIsError(false);
-        let res = await fetch(url);
-        if (res.status >= 500) {
-          let text = res.statusText;
-          setIsError(new Error(text));
+        const res = await axiosPrivate.get(endpoint, {
+          signal: controller.signal,
+        });
+        isMounted && setData(res.data);
+      } catch (err) {
+        if (err.response.status === 401) {
+          console.log("Refresh Token Expired");
         }
-        let json = await res.json();
-        if (json.error) {
-          setIsError(new Error(json.error));
-        } else {
-          setData(json);
-        }
-      }
-      catch (err) {
         setIsError(err);
       }
       setIsLoading(false);
-    }
+    };
+
     fetchData();
-  }, [url]);
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, [axiosPrivate, endpoint]);
+
   return { data, isError, isLoading };
-}
+};
 
 export default useFetch;

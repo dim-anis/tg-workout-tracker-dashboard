@@ -3,7 +3,6 @@ import styled from "styled-components";
 const StyledUL = styled.ul`
   padding: 0.5rem 1rem;
   list-style: none;
-  //background-color: papayawhip;
   border-radius: 10px;
   text-align: center;
 `;
@@ -21,17 +20,15 @@ const StyledLI = styled.li`
 `;
 
 const WorkoutSets = ({ sets }) => {
-  const exerciseNames = sets.map(set => set.exercise);
+  const exerciseNames = sets.map((set) => set.exercise);
   const uniqueExerciseName = [...new Set(exerciseNames)];
-  return ( 
+  return (
     <StyledUL>
-      {
-      uniqueExerciseName.map((exercise) => (
+      {uniqueExerciseName.map((exercise) => (
         <StyledLI>{exercise}</StyledLI>
-      ))
-      }
+      ))}
     </StyledUL>
-   );
-}
- 
+  );
+};
+
 export default WorkoutSets;
