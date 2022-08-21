@@ -13,6 +13,12 @@ const Container = styled.div`
 const Message = styled.div`
   display: flex;
   flex-direction: column;
+  gap: 1rem;
+`;
+
+const MessageContainer = styled.div`
+  display: flex;
+  flex-direction: column;
   text-align: center;
 `;
 
@@ -37,8 +43,10 @@ const PageNotFound = () => {
   return (
     <Container>
       <Message>
-        <h1>Error 404</h1>
-        <p>The page you are trying to access does not exist.</p>
+        <MessageContainer>
+          <h1>Error 404</h1>
+          <p>The page you are trying to access does not exist.</p>
+        </MessageContainer>
         <StyledRouterLink to="/">Back to Main</StyledRouterLink>
       </Message>
     </Container>

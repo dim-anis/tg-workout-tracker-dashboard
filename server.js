@@ -28,6 +28,12 @@ app.use(express.json());
 
 app.use(cookieParser());
 
+app.use("/register", register);
+app.use("/signin", signin);
+app.use("/refresh", refresh);
+app.use("/logout", logout);
+app.use("/stats", stats);
+
 if (
   process.env.NODE_ENV === "production" ||
   process.env.NODE_ENV === "staging"
@@ -37,12 +43,6 @@ if (
     res.sendFile(path.join(__dirname + "/client/build/index.html"));
   });
 }
-
-app.use("/register", register);
-app.use("/signin", signin);
-app.use("/refresh", refresh);
-app.use("/logout", logout);
-app.use("/stats", stats);
 
 app.all("*", (req, res) => {
   res.status(404);
