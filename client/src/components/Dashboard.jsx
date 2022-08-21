@@ -61,7 +61,6 @@ const Dashboard = () => {
 
   // selecting last workout's date to display
   const lastWorkoutDate = format(new Date(workoutData.at(-1).date), "MMM d");
-
   const lastWeekOfWorkouts = workoutData.slice(-4);
   const secondToLastWeekOfWorkouts = workoutData.slice(-8, -4);
   const lastMonthOfWorkouts = workoutData.slice(-16);
