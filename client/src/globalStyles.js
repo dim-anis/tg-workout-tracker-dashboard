@@ -78,7 +78,7 @@ const GlobalStyle = createGlobalStyle`
 
   html, body, #root, #root>div {
     height: 100%;
-    min-height: 100vh;
+    min-height: 100%;
     width: 100%;
   }
 
