@@ -13,7 +13,7 @@ const Container = styled.div`
 const Message = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 2rem;
 `;
 
 const MessageContainer = styled.div`
@@ -25,9 +25,9 @@ const MessageContainer = styled.div`
 const StyledRouterLink = styled(Link)`
   border: 1px solid ${(props) => props.theme.colorMain};
   border-radius: 10px;
-  //color: ${(props) => props.theme.colorMain};
   text-decoration: none;
   padding: 1rem;
+  text-align: center;
 
   &:hover {
     background: ${(props) => props.theme.colorMain};

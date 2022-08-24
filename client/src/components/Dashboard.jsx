@@ -3,6 +3,7 @@ import styled from "styled-components";
 import useFetch from "../hooks/useFetch";
 import format from "date-fns/format";
 
+import Modal from "./Modal";
 import ItemComponent from "./ItemComponent";
 import LineChart from "./LineChart";
 import PieChart from "./PieChart";
@@ -41,9 +42,20 @@ const H2 = styled.h2`
   color: ${(props) => props.theme.textColorSecondary};
 `;
 
+const Input = styled.input`
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+`;
+
 const Dashboard = () => {
   const { data: workoutData, isError } = useFetch(`/stats`);
   const [period, setPeriod] = useState(16);
+  const [set, setSet] = useState({
+    weight: 0,
+    repetitions: 0,
+    rpe: 0,
+  });
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   if (isError?.response?.status === 401) {
     return <Navigate to="/signin" />;
@@ -119,8 +131,58 @@ const Dashboard = () => {
     },
   ];
 
+  const handleChange = (e) => {
+    setSet({
+      ...set,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleClose = (e) => {
+    setIsModalOpen(false);
+  };
+
+  const handleOpen = () => {
+    setIsModalOpen(true);
+  };
+
   return (
     <>
+      <Modal isOpen={isModalOpen} handleClose={handleClose}>
+        <label htmlFor="weight">Weight</label>
+        <Input
+          id="weight"
+          name="weight"
+          value={set.weight}
+          onChange={handleChange}
+          type="number"
+          min="1"
+          max="999"
+          required
+        />
+        <label htmlFor="repetitions">Repetitions</label>
+        <Input
+          id="repetitions"
+          name="repetitions"
+          value={set.repetitions}
+          onChange={handleChange}
+          type="number"
+          min="1"
+          max="99"
+          required
+        />
+        <label htmlFor="rpe">RPE</label>
+        <Input
+          id="rpe"
+          name="rpe"
+          value={set.rpe}
+          onChange={handleChange}
+          type="number"
+          min="5"
+          max="10"
+          required
+        />
+      </Modal>
       <DashboardTile gColumn={"1 / -1"}>
         <LineChart
           height={"60%"}
@@ -177,6 +239,7 @@ const Dashboard = () => {
               name={workout.exercise}
               date={`RPE: ${workout.rpe}`}
               weight={workout.weight}
+              handleClick={handleOpen}
             />
           ))}
         </SetContainer>

@@ -15,6 +15,12 @@ const Container = styled.div`
   }
 `;
 
+const Button = styled.button`
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+`;
+
 const LeftContainer = styled.div`
   display: flex;
   align-items: center;
@@ -42,7 +48,7 @@ const Subtitle = styled.p`
   color: ${(props) => props.theme.textColorSecondary};
 `;
 
-const WorkoutItem = ({ name, date, weight }) => {
+const WorkoutItem = ({ name, date, weight, handleClick }) => {
   return (
     <Container>
       <LeftContainer>
@@ -54,12 +60,14 @@ const WorkoutItem = ({ name, date, weight }) => {
       </LeftContainer>
       <RightContainer>
         <Title>{`${new Intl.NumberFormat().format(weight)} KG`}</Title>
-        <IconMore
-          style={{
-            width: "1.5rem",
-            transform: "rotate(90deg)",
-          }}
-        />
+        <Button onClick={handleClick}>
+          <IconMore
+            style={{
+              width: "1.5rem",
+              transform: "rotate(90deg)",
+            }}
+          />
+        </Button>
       </RightContainer>
     </Container>
   );

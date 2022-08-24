@@ -96,6 +96,10 @@ const GlobalStyle = createGlobalStyle`
     color: ${(props) => props.theme.textColor};
   }
 
+  body.modal-open {
+    overflow: hidden;
+  }
+
   img, picture, video, canvas, svg {
     display: block;
     max-width: 100%;

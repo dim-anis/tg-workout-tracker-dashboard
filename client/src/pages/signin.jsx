@@ -67,11 +67,6 @@ export const StyledInput = styled.input`
     outline: 2px solid ${(props) => props.theme.colorHighlightGreen};
     border-color: transparent;
   }
-
-  /* &[aria-invalid="false"] {
-    outline: 1px solid green;
-    border-color: transparent;
-  } */
 `;
 
 export const StyledButton = styled.button`
@@ -101,6 +96,8 @@ export const ErrorMessage = styled.p`
   color: ${(props) => props.theme.colorHighlightRed};
   background-color: ${(props) => props.theme.colorHighlightBgRed};
   padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
 `;
 
 const SignIn = () => {
