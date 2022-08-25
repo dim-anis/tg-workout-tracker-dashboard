@@ -23,7 +23,9 @@ const GlobalStyle = createGlobalStyle`
     --clr-blue-light-muted: hsl(215 100% 60%);
     
     --clr-highlight-green: hsl(104 72% 50%);
+    --clr-highlight-green-dark: hsl(95, 38%, 62%);
     --clr-highlight-red: hsl(359 75% 50%);
+    --clr-highlight-red-dark: hsl(355, 65%, 65%);
     --clr-highlight-yellow: hsl(42 93% 50%);
     --clr-highlight-bg-green: 100 39% 95%;
     --clr-highlight-bg-red: 355 41% 95%;
@@ -112,6 +114,16 @@ const GlobalStyle = createGlobalStyle`
   p, h1, h2, h3, h4, h5, h6 {
     overflow-wrap: break-word;
     margin: 0;
+  }
+
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+  }
+
+  input[type=number] {
+  -moz-appearance: textfield;
   }
 
   #root, #__next {

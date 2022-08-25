@@ -48,7 +48,7 @@ const Subtitle = styled.p`
   color: ${(props) => props.theme.textColorSecondary};
 `;
 
-const WorkoutItem = ({ name, date, weight, handleClick }) => {
+const WorkoutItem = ({ name, date, weight, handleClick, _id }) => {
   return (
     <Container>
       <LeftContainer>
@@ -60,7 +60,7 @@ const WorkoutItem = ({ name, date, weight, handleClick }) => {
       </LeftContainer>
       <RightContainer>
         <Title>{`${new Intl.NumberFormat().format(weight)} KG`}</Title>
-        <Button onClick={handleClick}>
+        <Button onClick={handleClick} id={_id}>
           <IconMore
             style={{
               width: "1.5rem",

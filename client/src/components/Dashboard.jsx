@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import useFetch from "../hooks/useFetch";
 import format from "date-fns/format";
 
 import Modal from "./Modal";
+import { StyledInput } from "../pages/signin";
 import ItemComponent from "./ItemComponent";
 import LineChart from "./LineChart";
 import PieChart from "./PieChart";
@@ -15,6 +16,12 @@ import { ReactComponent as IconCalendar } from "../images/icons/calendar.svg";
 import { ReactComponent as IconCheckbox } from "../images/icons/checkbox.svg";
 import { Navigate } from "react-router-dom";
 import WorkoutItem from "./WorkoutsTable/WorkoutItem";
+import { useEffect } from "react";
+
+const WEIGHT_REGEX = /(^\d{1,3}$)/;
+const REPETITIONS_REGEX = /(^\d{1,2}$)/;
+const RPE_REGEX =
+  /^[5-9]{1}$|^[5-9]{1}\.(5)$|^[5-9]{1}\.$|^[5-9]{1}\.(0)*$|^[1][0]$/;
 
 export const FetchResultContainer = styled.div`
   grid-column: 1 / -1;
@@ -47,15 +54,46 @@ const Input = styled.input`
   border-radius: 0.5rem;
 `;
 
+const InputContainer = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+`;
+
 const Dashboard = () => {
   const { data: workoutData, isError } = useFetch(`/stats`);
+  const errorRef = useRef();
+
   const [period, setPeriod] = useState(16);
-  const [set, setSet] = useState({
-    weight: 0,
-    repetitions: 0,
-    rpe: 0,
-  });
+  const [set, setSet] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [validWeight, setValidWeight] = useState(false);
+  const [weightFocus, setWeightFocus] = useState(false);
+
+  const [validRepetitions, setValidRepetitions] = useState(false);
+  const [repetitionsFocus, setRepetitionsFocus] = useState(false);
+
+  const [validRpe, setValidRpe] = useState(false);
+  const [rpeFocus, setRpeFocus] = useState(false);
+
+  const [errMsg, setErrMsg] = useState("");
+  const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    const result = WEIGHT_REGEX.test(set.weight);
+    setValidWeight(result);
+  }, [set.weight]);
+
+  useEffect(() => {
+    const result = REPETITIONS_REGEX.test(set.repetitions);
+    setValidRepetitions(result);
+  }, [set.repetitions]);
+
+  useEffect(() => {
+    const result = RPE_REGEX.test(set.rpe);
+    setValidRpe(result);
+  }, [set.rpe]);
 
   if (isError?.response?.status === 401) {
     return <Navigate to="/signin" />;
@@ -106,6 +144,8 @@ const Dashboard = () => {
     0
   );
 
+  const lastWorkoutSets = workoutData.at(-1).sets;
+
   const diff = (
     ((volumeThisWeek - volumeLastWeek) / volumeThisWeek) *
     100
@@ -134,54 +174,91 @@ const Dashboard = () => {
   const handleChange = (e) => {
     setSet({
       ...set,
-      [e.target.name]: e.target.value,
+      [e.target.name]: parseFloat(e.target.value),
     });
   };
 
-  const handleClose = (e) => {
+  const handleClose = () => {
     setIsModalOpen(false);
+    setSet({});
   };
 
-  const handleOpen = () => {
+  const handleOpen = (e) => {
+    const setId = e.currentTarget.id;
+    const setToEdit = lastWorkoutSets.filter((set) => set._id === setId);
+    setSet({
+      ...setToEdit[0],
+    });
     setIsModalOpen(true);
   };
 
   return (
     <>
-      <Modal isOpen={isModalOpen} handleClose={handleClose}>
-        <label htmlFor="weight">Weight</label>
-        <Input
-          id="weight"
-          name="weight"
-          value={set.weight}
-          onChange={handleChange}
-          type="number"
-          min="1"
-          max="999"
-          required
-        />
-        <label htmlFor="repetitions">Repetitions</label>
-        <Input
-          id="repetitions"
-          name="repetitions"
-          value={set.repetitions}
-          onChange={handleChange}
-          type="number"
-          min="1"
-          max="99"
-          required
-        />
-        <label htmlFor="rpe">RPE</label>
-        <Input
-          id="rpe"
-          name="rpe"
-          value={set.rpe}
-          onChange={handleChange}
-          type="number"
-          min="5"
-          max="10"
-          required
-        />
+      <Modal
+        isOpen={isModalOpen}
+        handleClose={handleClose}
+        title={set.exercise}
+      >
+        <InputContainer>
+          <label htmlFor="weight">Weight</label>
+          <StyledInput
+            type="number"
+            id="weight"
+            name="weight"
+            aria-invalid={validWeight || !set.weight ? "false" : "true"}
+            ria-describedby="weightmessage"
+            valid={validWeight && set.weight}
+            value={set.weight || null}
+            onChange={handleChange}
+            onFocus={() => setWeightFocus(true)}
+            onBlur={() => setWeightFocus(false)}
+            min="1"
+            max="999"
+            required
+            widthAuto
+          />
+        </InputContainer>
+        <InputContainer>
+          <label htmlFor="repetitions">Repetitions</label>
+          <StyledInput
+            type="number"
+            id="repetitions"
+            name="repetitions"
+            aria-invalid={
+              validRepetitions || !set.repetitions ? "false" : "true"
+            }
+            aria-describedby="repmessage"
+            valid={validRepetitions && set.repetions}
+            value={set.repetitions || ""}
+            onChange={handleChange}
+            onFocus={() => setRepetitionsFocus(true)}
+            onBlur={() => setRepetitionsFocus(false)}
+            min="1"
+            max="99"
+            required
+            widthAuto
+          />
+        </InputContainer>
+        <InputContainer>
+          <label htmlFor="rpe">RPE</label>
+          <StyledInput
+            type="number"
+            id="rpe"
+            name="rpe"
+            aria-invalid={validRpe || !set.rpe ? "false" : "true"}
+            aria-describedby="rpemessage"
+            valid={validRpe && set.rpe}
+            value={set.rpe || ""}
+            onChange={handleChange}
+            onFocus={() => setRpeFocus(true)}
+            onBlur={() => setRpeFocus(false)}
+            step="0.5"
+            min="5"
+            max="10"
+            required
+            widthAuto
+          />
+        </InputContainer>
       </Modal>
       <DashboardTile gColumn={"1 / -1"}>
         <LineChart
@@ -233,8 +310,9 @@ const Dashboard = () => {
       <DashboardTile gColumn={"1 / -1"} flexDirection={"column"}>
         <H2>History</H2>
         <SetContainer>
-          {workoutData.at(-1).sets.map((workout) => (
+          {lastWorkoutSets.map((workout) => (
             <WorkoutItem
+              _id={workout._id}
               id={workout._id}
               name={workout.exercise}
               date={`RPE: ${workout.rpe}`}

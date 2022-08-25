@@ -6,7 +6,7 @@ import { ReactComponent as IconClose } from "../images/icons/close.svg";
 
 const Dialog = styled.dialog`
   justify-content: center;
-  gap: 1rem;
+  gap: 2rem;
   width: 50vw;
   border-radius: 1rem;
   background: ${(props) => props.theme.bgColorSecondary};
@@ -60,35 +60,34 @@ const ButtonContainer = styled.div`
   margin-top: 1rem;
 `;
 
-const InputContainer = styled.div`
+const Form = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 `;
 
-const Modal = ({ children, isOpen, handleClose }) => {
-  const ref = useRef(null);
+const Modal = ({ children, title, isOpen, handleClose }) => {
+  const modalRef = useRef(null);
 
   useEffect(() => {
     if (isOpen) {
-      console.log("showing modal");
-      ref.current?.showModal();
+      modalRef.current?.showModal();
       document.body.classList.add("modal-open");
     } else {
-      ref.current?.close();
+      modalRef.current?.close();
       document.body.classList.remove("modal-open");
     }
   }, [isOpen]);
 
   return (
-    <Dialog ref={ref} onCancel={handleClose} onClick={handleClose}>
+    <Dialog ref={modalRef} onCancel={handleClose}>
       <ModalTitle>
-        <h2 style={{ margin: 0 }}>Edit set</h2>
+        <h2 style={{ margin: 0 }}>{title}</h2>
         <ModalCloseButton onClick={handleClose}>
           <IconClose style={{ width: "2rem" }} />
         </ModalCloseButton>
       </ModalTitle>
-      <InputContainer>{children}</InputContainer>
+      <Form>{children}</Form>
       <ButtonContainer>
         <ModalButton onClick={handleClose}>Cancel</ModalButton>
         <ModalButton main>Submit</ModalButton>
