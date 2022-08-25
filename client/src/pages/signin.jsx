@@ -36,7 +36,7 @@ export const StyledForm = styled.form`
 export const StyledInput = styled.input`
   color: ${(props) => props.theme.textColorSecondary};
   font-size: var(--fs-300);
-  width: 100%;
+  width: ${(props) => (props.widthAuto ? "auto" : "100%")};
   font-family: inherit;
   padding: 0.75rem;
   border-radius: 10px;
@@ -57,7 +57,9 @@ export const StyledInput = styled.input`
   :-webkit-autofill:focus {
     background: transparent;
   }
-
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
   &:not(:focus):not(:placeholder-shown)[aria-invalid="true"] {
     outline: 2px solid ${(props) => props.theme.colorHighlightRed};
     border-color: transparent;
@@ -67,11 +69,6 @@ export const StyledInput = styled.input`
     outline: 2px solid ${(props) => props.theme.colorHighlightGreen};
     border-color: transparent;
   }
-
-  /* &[aria-invalid="false"] {
-    outline: 1px solid green;
-    border-color: transparent;
-  } */
 `;
 
 export const StyledButton = styled.button`
@@ -101,6 +98,8 @@ export const ErrorMessage = styled.p`
   color: ${(props) => props.theme.colorHighlightRed};
   background-color: ${(props) => props.theme.colorHighlightBgRed};
   padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
 `;
 
 const SignIn = () => {
