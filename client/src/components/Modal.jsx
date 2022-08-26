@@ -5,34 +5,28 @@ import styled from "styled-components";
 import { ReactComponent as IconClose } from "../images/icons/close.svg";
 
 const Dialog = styled.dialog`
-  justify-content: center;
-  gap: 2rem;
-  width: 50vw;
+  margin: auto;
   border-radius: 1rem;
   background: ${(props) => props.theme.bgColorSecondary};
   color: ${(props) => props.theme.textColor};
   box-shadow: var(--shadow-elevation-high);
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 9999;
   padding: 2rem;
   border: none;
 
   &::backdrop {
     background: rgba(0, 0, 0, 0.3);
   }
+`;
 
-  @media (max-width: 50em) {
-    width: 95%;
-  }
+const H2 = styled.h2`
+  font-size: var(--fs-600);
 `;
 
 const ModalTitle = styled.div`
   display: flex;
   width: 100%;
   justify-content: space-between;
+  margin-bottom: 1rem;
 `;
 
 const ModalCloseButton = styled.button`
@@ -64,6 +58,7 @@ const Form = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  margin-bottom: 2rem;
 `;
 
 const Modal = ({ children, title, isOpen, handleClose }) => {
@@ -82,16 +77,18 @@ const Modal = ({ children, title, isOpen, handleClose }) => {
   return (
     <Dialog ref={modalRef} onCancel={handleClose}>
       <ModalTitle>
-        <h2 style={{ margin: 0 }}>{title}</h2>
+        <H2 style={{ margin: 0 }}>{title}</H2>
         <ModalCloseButton onClick={handleClose}>
           <IconClose style={{ width: "2rem" }} />
         </ModalCloseButton>
       </ModalTitle>
-      <Form>{children}</Form>
-      <ButtonContainer>
-        <ModalButton onClick={handleClose}>Cancel</ModalButton>
-        <ModalButton main>Submit</ModalButton>
-      </ButtonContainer>
+      <div>
+        <Form>{children}</Form>
+        <ButtonContainer>
+          <ModalButton onClick={handleClose}>Cancel</ModalButton>
+          <ModalButton main>Submit</ModalButton>
+        </ButtonContainer>
+      </div>
     </Dialog>
   );
 };
