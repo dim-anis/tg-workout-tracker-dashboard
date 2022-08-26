@@ -7,7 +7,6 @@ import Modal from "./Modal";
 import { StyledInput } from "../pages/signin";
 import ItemComponent from "./ItemComponent";
 import LineChart from "./LineChart";
-import PieChart from "./PieChart";
 import DashboardTile from "./DashboardTile";
 import LoadingIcon from "./LoadingIcon";
 
@@ -18,8 +17,8 @@ import { Navigate } from "react-router-dom";
 import WorkoutItem from "./WorkoutsTable/WorkoutItem";
 import { useEffect } from "react";
 
-const WEIGHT_REGEX = /(^\d{1,3}$)/;
-const REPETITIONS_REGEX = /(^\d{1,2}$)/;
+const WEIGHT_REGEX = /^\d{1,3}$|^\d{1,3}\.\d{0,2}$/;
+const REPETITIONS_REGEX = /^\d{1,2}$/;
 const RPE_REGEX =
   /^[5-9]{1}$|^[5-9]{1}\.(5)$|^[5-9]{1}\.$|^[5-9]{1}\.(0)*$|^[1][0]$/;
 
@@ -49,15 +48,20 @@ const H2 = styled.h2`
   color: ${(props) => props.theme.textColorSecondary};
 `;
 
-const Input = styled.input`
-  padding: 0.5rem;
-  border-radius: 0.5rem;
+const HelperMessage = styled.p`
+  margin: 0;
+  padding: 0;
+  color: ${(props) => props.theme.colorHighlightRed};
+  font-size: var(--fs-200);
+  text-align: left;
 `;
 
-const InputContainer = styled.div`
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
+const InputContainer = styled.div``;
+
+const Label = styled.label`
+  display: inline-block;
+  margin-bottom: 0.25rem;
+  font-size: var(--fs-400);
 `;
 
 const Dashboard = () => {
@@ -79,6 +83,10 @@ const Dashboard = () => {
 
   const [errMsg, setErrMsg] = useState("");
   const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    console.log(set);
+  }, [set]);
 
   useEffect(() => {
     const result = WEIGHT_REGEX.test(set.weight);
@@ -158,23 +166,10 @@ const Dashboard = () => {
     y: Math.floor(volumePerWorkout(workout.sets)),
   }));
 
-  const pieChartData = [
-    {
-      id: "done",
-      label: "done",
-      value: workoutsThisMeso,
-    },
-    {
-      id: "left",
-      label: "left",
-      value: 20 - workoutsThisMeso,
-    },
-  ];
-
   const handleChange = (e) => {
     setSet({
       ...set,
-      [e.target.name]: parseFloat(e.target.value),
+      [e.target.name]: parseFloat(e.target.value) || undefined,
     });
   };
 
@@ -200,33 +195,35 @@ const Dashboard = () => {
         title={set.exercise}
       >
         <InputContainer>
-          <label htmlFor="weight">Weight</label>
+          <Label htmlFor="weight">Weight</Label>
           <StyledInput
             type="number"
             id="weight"
             name="weight"
-            aria-invalid={validWeight || !set.weight ? "false" : "true"}
+            aria-invalid={validWeight ? "false" : "true"}
             ria-describedby="weightmessage"
             valid={validWeight && set.weight}
-            value={set.weight || null}
+            value={set.weight || ""}
             onChange={handleChange}
             onFocus={() => setWeightFocus(true)}
             onBlur={() => setWeightFocus(false)}
             min="1"
             max="999"
             required
-            widthAuto
           />
         </InputContainer>
+        {weightFocus && !validWeight && (
+          <HelperMessage id="weightmessage">
+            Please enter a valid value between 1 and 999 <br />
+          </HelperMessage>
+        )}
         <InputContainer>
-          <label htmlFor="repetitions">Repetitions</label>
+          <Label htmlFor="repetitions">Repetitions</Label>
           <StyledInput
             type="number"
             id="repetitions"
             name="repetitions"
-            aria-invalid={
-              validRepetitions || !set.repetitions ? "false" : "true"
-            }
+            aria-invalid={validRepetitions ? "false" : "true"}
             aria-describedby="repmessage"
             valid={validRepetitions && set.repetions}
             value={set.repetitions || ""}
@@ -236,16 +233,20 @@ const Dashboard = () => {
             min="1"
             max="99"
             required
-            widthAuto
           />
         </InputContainer>
+        {repetitionsFocus && !validRepetitions && (
+          <HelperMessage id="repmessage">
+            Please enter a valid value between 1 and 99 <br />
+          </HelperMessage>
+        )}
         <InputContainer>
-          <label htmlFor="rpe">RPE</label>
+          <Label htmlFor="rpe">RPE</Label>
           <StyledInput
             type="number"
             id="rpe"
             name="rpe"
-            aria-invalid={validRpe || !set.rpe ? "false" : "true"}
+            aria-invalid={validRpe ? "false" : "true"}
             aria-describedby="rpemessage"
             valid={validRpe && set.rpe}
             value={set.rpe || ""}
@@ -256,9 +257,14 @@ const Dashboard = () => {
             min="5"
             max="10"
             required
-            widthAuto
           />
         </InputContainer>
+        {rpeFocus && !validRpe && (
+          <HelperMessage id="rpemessage">
+            Please enter a valid value between 5 and 10 (0.5 steps allowed: 5.5,
+            6.5 etc.) <br />
+          </HelperMessage>
+        )}
       </Modal>
       <DashboardTile gColumn={"1 / -1"}>
         <LineChart
@@ -294,11 +300,6 @@ const Dashboard = () => {
         <progress max={20} value={workoutsThisMeso}>
           {workoutsThisMeso}
         </progress>
-        {/* <PieChart
-          data={pieChartData}
-          total={20}
-          title={"WORKOUTS THIS MESOCYCLE"}
-        /> */}
       </DashboardTile>
       <DashboardTile justifyContent={"left"} alignItems={"center"}>
         <ItemComponent

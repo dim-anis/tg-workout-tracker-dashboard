@@ -36,11 +36,10 @@ export const StyledForm = styled.form`
 export const StyledInput = styled.input`
   color: ${(props) => props.theme.textColorSecondary};
   font-size: var(--fs-300);
-  width: ${(props) => (props.widthAuto ? "auto" : "100%")};
-  font-family: inherit;
+  width: 100%;
   padding: 0.75rem;
-  border-radius: 10px;
-  background: transparent;
+  border-radius: 0.5rem;
+  background: ${(props) => props.theme.bgColor};
   border: 2px solid ${(props) => props.theme.textColorSecondary};
 
   &:autofill {
@@ -50,6 +49,7 @@ export const StyledInput = styled.input`
   &:focus {
     color: ${(props) => props.theme.textColor};
     border-color: transparent;
+    outline: 2px solid ${(props) => props.theme.colorMain};
   }
 
   :-webkit-autofill,
@@ -60,13 +60,14 @@ export const StyledInput = styled.input`
   input[type="number"] {
     -moz-appearance: textfield;
   }
-  &:not(:focus):not(:placeholder-shown)[aria-invalid="true"] {
+  &:focus:not(:placeholder-shown)[aria-invalid="true"] {
     outline: 2px solid ${(props) => props.theme.colorHighlightRed};
     border-color: transparent;
   }
 
   &:not(:focus):not(:placeholder-shown)[aria-invalid="false"] {
-    outline: 2px solid ${(props) => props.theme.colorHighlightGreen};
+    //outline: 2px solid ${(props) => props.theme.colorHighlightGreen};
+    outline: 2px solid ${(props) => props.theme.bgColorSecondary};
     border-color: transparent;
   }
 `;
