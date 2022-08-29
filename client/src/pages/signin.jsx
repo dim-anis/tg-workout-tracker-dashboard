@@ -6,6 +6,7 @@ import useAuth from "../hooks/useAuth";
 import axios from "../api/axios";
 
 import Note from "./note";
+import Button from "../components/Button";
 
 export const Container = styled.div`
   margin: 0 auto;
@@ -69,22 +70,6 @@ export const StyledInput = styled.input`
     //outline: 2px solid ${(props) => props.theme.colorHighlightGreen};
     outline: 2px solid ${(props) => props.theme.bgColorSecondary};
     border-color: transparent;
-  }
-`;
-
-export const StyledButton = styled.button`
-  color: ${(props) => props.theme.textContrast};
-  font-size: var(--fs-300);
-  font-weight: 600;
-  background-color: ${(props) => props.theme.colorMain};
-  border: none;
-  padding: 0.5rem;
-  border-radius: 10px;
-  width: 100%;
-  margin-top: 1rem;
-
-  &:hover {
-    background-color: ${(props) => props.theme.colorMainMuted};
   }
 `;
 
@@ -182,7 +167,9 @@ const SignIn = () => {
             />
           </div>
           <div>
-            <StyledButton type="submit">Sign In</StyledButton>
+            <Button main width="100%" type="submit">
+              Sign In
+            </Button>
           </div>
         </StyledForm>
         <Note to="/register" linkText="Create an account">

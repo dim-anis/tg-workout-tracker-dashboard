@@ -11,7 +11,13 @@ const handleRegister = async (req, res) => {
       email: req.body.email,
       password: hashed_password,
     });
-    res.json({ status: "ok", user: user, message: "Registration Success" });
+    if (user) {
+      res.status(201).json({
+        message: `New user ${user.name} created`,
+      });
+    } else {
+      res.status(400).json({ message: "Invalid user data reveiced" });
+    }
   } catch (err) {
     if (err.name === "MongoServerError" && err.code === 11000) {
       res.status(409).send({

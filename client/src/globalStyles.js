@@ -19,8 +19,8 @@ const GlobalStyle = createGlobalStyle`
     --clr-blue: hsl(210 98% 47%);
     --clr-blue-muted: hsl(210 98% 40%);
     --clr-blue-dark: hsl(215 100% 37%);
-    --clr-blue-light: hsl(215 100% 70%);
-    --clr-blue-light-muted: hsl(215 100% 60%);
+    --clr-blue-light: hsl(215 100% 60%);
+    --clr-blue-light-muted: hsl(215 100% 50%);
     
     --clr-highlight-green: hsl(104 72% 50%);
     --clr-highlight-green-dark: hsl(95, 38%, 62%);
