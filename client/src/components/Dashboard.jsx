@@ -16,6 +16,7 @@ import { ReactComponent as IconCheckbox } from "../images/icons/checkbox.svg";
 import { Navigate } from "react-router-dom";
 import WorkoutItem from "./WorkoutsTable/WorkoutItem";
 import { useEffect } from "react";
+import axios from "../api/axios";
 
 const WEIGHT_REGEX = /^\d{1,3}$|^\d{1,3}\.\d{0,2}$/;
 const REPETITIONS_REGEX = /^\d{1,2}$/;
@@ -152,12 +153,22 @@ const Dashboard = () => {
     0
   );
 
+  const volumeThisMonthFormatted = new Intl.NumberFormat().format(
+    Math.round(volumeThisMonth)
+  );
+
+  const volumeThisWeekFormatted = new Intl.NumberFormat().format(
+    Math.round(volumeThisWeek)
+  );
+
   const lastWorkoutSets = workoutData.at(-1).sets;
 
   const diff = (
     ((volumeThisWeek - volumeLastWeek) / volumeThisWeek) *
     100
   ).toFixed(1);
+
+  const diffFormated = new Intl.NumberFormat().format(diff);
 
   const selectPeriod = workoutData.slice(-period);
 
@@ -187,11 +198,29 @@ const Dashboard = () => {
     setIsModalOpen(true);
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const res = await axios.patch("/stats", JSON.stringify(set), {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+
+      setIsModalOpen(false);
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
   return (
     <>
       <Modal
         isOpen={isModalOpen}
         handleClose={handleClose}
+        onSubmit={handleSubmit}
         title={set.exercise}
       >
         <InputContainer>
@@ -272,7 +301,7 @@ const Dashboard = () => {
           margin={{ top: 20, right: 40, bottom: 50, left: 40 }}
           data={chartData}
           title={`VOLUME THIS MONTH`}
-          titleValue={new Intl.NumberFormat().format(volumeThisMonth)}
+          titleValue={volumeThisMonthFormatted}
           yValueUnit={"KG"}
           xValueType={"Date"}
           yValueType={"Volume"}
@@ -282,8 +311,8 @@ const Dashboard = () => {
       <DashboardTile justifyContent={"left"} alignItems={"center"}>
         <ItemComponent
           icon={<IconBulb />}
-          data={new Intl.NumberFormat().format(volumeThisWeek)}
-          diff={new Intl.NumberFormat().format(diff)}
+          data={volumeThisWeekFormatted}
+          diff={diffFormated}
           title={"VOLUME THIS WEEK"}
         />
       </DashboardTile>

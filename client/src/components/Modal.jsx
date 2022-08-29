@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 
 import { ReactComponent as IconClose } from "../images/icons/close.svg";
+import Button from "./Button";
 
 const Dialog = styled.dialog`
   margin: auto;
@@ -36,32 +37,13 @@ const ModalCloseButton = styled.button`
   cursor: pointer;
 `;
 
-const ModalButton = styled.button`
-  background-color: transparent;
-  border: none;
-  color: ${(props) => props.theme.textContrast};
-  border: 1px solid
-    ${(props) =>
-      props.main ? props.theme.colorMain : props.theme.textColorSecondary};
-  padding: 1rem;
-  border-radius: 0.5rem;
-  background-color: ${(props) => (props.main ? props.theme.colorMain : "none")};
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-top: 1rem;
-`;
-
-const Form = styled.div`
+const Form = styled.form`
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  margin-bottom: 2rem;
 `;
 
-const Modal = ({ children, title, isOpen, handleClose }) => {
+const Modal = ({ children, title, isOpen, handleClose, onSubmit }) => {
   const modalRef = useRef(null);
 
   useEffect(() => {
@@ -82,13 +64,12 @@ const Modal = ({ children, title, isOpen, handleClose }) => {
           <IconClose style={{ width: "2rem" }} />
         </ModalCloseButton>
       </ModalTitle>
-      <div>
-        <Form>{children}</Form>
-        <ButtonContainer>
-          <ModalButton onClick={handleClose}>Cancel</ModalButton>
-          <ModalButton main>Submit</ModalButton>
-        </ButtonContainer>
-      </div>
+      <Form onSubmit={onSubmit} action="">
+        {children}
+        <Button main width="100%">
+          Submit
+        </Button>
+      </Form>
     </Dialog>
   );
 };

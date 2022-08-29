@@ -5,12 +5,12 @@ import {
   Container,
   StyledForm,
   StyledInput,
-  StyledButton,
   H1,
   FormWrapper,
   ErrorMessage,
 } from "./signin";
 import Note from "./note";
+import Button from "../components/Button";
 import axios from "../api/axios";
 import { Navigate } from "react-router-dom";
 
@@ -191,7 +191,9 @@ const Register = () => {
               />
             </div>
             <div>
-              <StyledButton type="submit">Sign Up</StyledButton>
+              <Button main width="100%" type="submit">
+                Sign Up
+              </Button>
             </div>
           </StyledForm>
           <Note to="/signin" linkText="Sign In">
