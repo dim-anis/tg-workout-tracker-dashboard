@@ -5,7 +5,6 @@ const useRefreshToken = () => {
   const auth = useAuth();
 
   const refresh = async () => {
-    console.log("running refresh");
     const res = await axios.get("/refresh", { withCredentials: true });
     auth.signin((prev) => {
       return { ...prev, accessToken: res.data.accessToken };

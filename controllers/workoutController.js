@@ -2,7 +2,7 @@ const Workout = require("../models/workout");
 
 const getAllWorkouts = async (req, res) => {
   try {
-    const workouts = await Workout.find().populate("user", "name").lean();
+    const workouts = await Workout.find().sort({date: 1}).populate("user", "name").lean();
     if (!workouts) {
       return res.status(400).json({ message: "No workouts found" });
     }

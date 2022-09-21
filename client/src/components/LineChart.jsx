@@ -112,7 +112,7 @@ const LineChart = ({
             <PeriodButton onClick={() => setPeriod(4)}>1W</PeriodButton>
             <PeriodButton onClick={() => setPeriod(8)}>2W</PeriodButton>
             <PeriodButton onClick={() => setPeriod(16)}>1M</PeriodButton>
-            <PeriodButton onClick={() => setPeriod(200)}>ALL</PeriodButton>
+            <PeriodButton onClick={() => setPeriod(96)}>6M</PeriodButton>
           </PeriodContainer>
         </ChartTitle>
       )}
