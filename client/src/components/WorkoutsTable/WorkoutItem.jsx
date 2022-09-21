@@ -48,14 +48,14 @@ const Subtitle = styled.p`
   color: ${(props) => props.theme.textColorSecondary};
 `;
 
-const WorkoutItem = ({ name, date, weight, handleClick, _id }) => {
+const WorkoutItem = ({ name, rpe, weight, handleClick, _id }) => {
   return (
     <Container>
       <LeftContainer>
         <IconUser style={{ width: "2rem" }} />
         <div>
           <Title>{name}</Title>
-          <Subtitle>{date}</Subtitle>
+          <Subtitle>{rpe}</Subtitle>
         </div>
       </LeftContainer>
       <RightContainer>

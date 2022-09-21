@@ -37,7 +37,7 @@ const useFetch = (endpoint) => {
     };
   }, [axiosPrivate, endpoint]);
 
-  return { data, isError, isLoading };
+  return { data, isError, isLoading, setData };
 };
 
 export default useFetch;

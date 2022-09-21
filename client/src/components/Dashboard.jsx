@@ -66,7 +66,9 @@ const Label = styled.label`
 `;
 
 const Dashboard = () => {
-  const { data: workoutData, isError } = useFetch(`/stats`);
+  const { data: workoutData, isError, setData } = useFetch(`/stats`);
+  const [lastWorkout, setLastWorkout] = useState({});
+  
   const errorRef = useRef();
 
   const [period, setPeriod] = useState(16);
@@ -84,10 +86,6 @@ const Dashboard = () => {
 
   const [errMsg, setErrMsg] = useState("");
   const [success, setSuccess] = useState(false);
-
-  useEffect(() => {
-    console.log(set);
-  }, [set]);
 
   useEffect(() => {
     const result = WEIGHT_REGEX.test(set.weight);
@@ -208,7 +206,10 @@ const Dashboard = () => {
         },
         withCredentials: true,
       });
-
+      const updatedSetIndex = workoutData.at(-1).sets.findIndex(element => element._id === set._id);
+      const sets = workoutData.at(-1).sets;
+      sets[updatedSetIndex] = set;
+      setData([...workoutData.slice(0, -1), {...workoutData.at(-1), sets}])
       setIsModalOpen(false);
     } catch (err) {
       console.log(err.message);
@@ -230,7 +231,7 @@ const Dashboard = () => {
             id="weight"
             name="weight"
             aria-invalid={validWeight ? "false" : "true"}
-            ria-describedby="weightmessage"
+            aria-describedby="weightmessage"
             valid={validWeight && set.weight}
             value={set.weight || ""}
             onChange={handleChange}
@@ -238,6 +239,7 @@ const Dashboard = () => {
             onBlur={() => setWeightFocus(false)}
             min="1"
             max="999"
+            step="any"
             required
           />
         </InputContainer>
@@ -326,9 +328,6 @@ const Dashboard = () => {
           title={"WORKOUTS THIS MESOCYCLE"}
           icon={<IconCheckbox />}
         />
-        <progress max={20} value={workoutsThisMeso}>
-          {workoutsThisMeso}
-        </progress>
       </DashboardTile>
       <DashboardTile justifyContent={"left"} alignItems={"center"}>
         <ItemComponent
@@ -340,12 +339,12 @@ const Dashboard = () => {
       <DashboardTile gColumn={"1 / -1"} flexDirection={"column"}>
         <H2>History</H2>
         <SetContainer>
-          {lastWorkoutSets.map((workout) => (
+          {workoutData.at(-1).sets.map((workout) => (
             <WorkoutItem
               _id={workout._id}
               id={workout._id}
               name={workout.exercise}
-              date={`RPE: ${workout.rpe}`}
+              rpe={`RPE: ${workout.rpe}`}
               weight={workout.weight}
               handleClick={handleOpen}
             />
